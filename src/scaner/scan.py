@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
+import os
 
 app = Flask(__name__)
 # CORS is configured to allow all origins
 CORS(app, resources={r"/update_status": {"origins": "http://localhost:5173"}})
 
-DB_PATH = '/Users/firdovsirzaev/Desktop/qr-scanner/src/scaner/usertestpagedb.db'
+DB_PATH = os.path.join('/tmp', 'usertestpagedb.db')
 
 
 # Initialize the database and table
