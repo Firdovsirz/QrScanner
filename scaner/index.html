@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        #qrContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .qr-item {
+            margin: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .qr-item img {
+            width: 150px;
+            height: 150px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>QR Code Generator and Viewer</h2>
+<button onclick="generateQr()">Generate New QR Code</button>
+<div id="qrContainer"></div>
+
+<script>
+    const apiUrl = 'http://127.0.0.1:5000';
+
+    // Function to generate a new QR code
+    async function generateQr() {
+        try {
+            const response = await fetch(`${apiUrl}/generate_qr`, { method: 'POST' });
+            if (response.ok) {
+                alert("New QR Code generated!");
+                fetchQrCodes();  // Refresh the QR code list
+            } else {
+                console.error("Failed to generate QR code.");
+            }
+        } catch (error) {
+            console.error("Error generating QR code:", error);
+        }
+    }
+
+    // Function to fetch and display QR codes
+    async function fetchQrCodes() {
+        try {
+            const response = await fetch(`${apiUrl}/get_qrs`);
+            const qrCodes = await response.json();
+            const qrContainer = document.getElementById("qrContainer");
+            qrContainer.innerHTML = "";  // Clear previous QR codes
+
+            qrCodes.forEach(qr => {
+                const qrItem = document.createElement("div");
+                qrItem.className = "qr-item";
+
+                // Display QR code image
+                const img = document.createElement("img");
+                img.src = `data:image/png;base64,${qr.image}`;
+                qrItem.appendChild(img);
+
+                // Display QR code ID and status
+                const idText = document.createElement("p");
+                idText.textContent = `ID: ${qr.id}`;
+                qrItem.appendChild(idText);
+
+                const statusText = document.createElement("p");
+                statusText.textContent = `Status: ${qr.status === 1 ? "Unscanned" : "Scanned"}`;
+                qrItem.appendChild(statusText);
+
+                // Add scan button if status is unscanned
+                if (qr.status === 1) {
+                    const scanButton = document.createElement("button");
+                    scanButton.textContent = "Mark as Scanned";
+                    scanButton.onclick = () => updateStatus(qr.id);
+                    qrItem.appendChild(scanButton);
+                }
+
+                qrContainer.appendChild(qrItem);
+            });
+        } catch (error) {
+            console.error("Error fetching QR codes:", error);
+        }
+    }
+
+    // Function to update the status of a QR code
+    async function updateStatus(qrId) {
+        try {
+            const response = await fetch(`${apiUrl}/update_status/${qrId}`, { method: 'PATCH' });
+            if (response.ok) {
+                alert("QR Code marked as scanned!");
+                fetchQrCodes();  // Refresh the QR code list
+            } else {
+                console.error("Failed to update QR code status.");
+            }
+        } catch (error) {
+            console.error("Error updating QR code status:", error);
+        }
+    }
+
+    // Fetch QR codes on page load
+    fetchQrCodes();
+</script>
+
+</body>
+</html>
