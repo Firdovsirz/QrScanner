@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 # CORS is configured to allow all origins
-CORS(app, resources={r"/update_status": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/update_status": {"origins": "*"}})
 
 DB_PATH = os.path.join('/tmp', 'usertestpagedb.db')
 
