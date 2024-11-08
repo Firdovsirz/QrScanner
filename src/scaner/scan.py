@@ -4,9 +4,9 @@ import sqlite3
 
 app = Flask(__name__)
 # CORS is configured to allow all origins
-CORS(app, resources={r"/update_status": {"origins": "http://localhost:5174"}})
+CORS(app, resources={r"/update_status": {"origins": "http://localhost:5173"}})
 
-DB_PATH = '/Users/firdovsirzaev/Desktop/qr-scanner/scaner/usertestpagedb.db'
+DB_PATH = '/Users/firdovsirzaev/Desktop/qr-scanner/src/scaner/usertestpagedb.db'
 
 
 # Initialize the database and table
